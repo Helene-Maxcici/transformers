@@ -1726,6 +1726,11 @@ class WhisperForConditionalGeneration(WhisperPreTrainedModel):
             # If the user passes `max_new_tokens`, increase its number to account for the prompt
             if kwargs.get("max_new_tokens", None) is not None:
                 kwargs["max_new_tokens"] += len(text_prompt_ids)
+                if kwargs["max_new_tokens"] > self.config.max_target_positions:
+                    logger.warning(
+                        f"Adding the `prompt_ids` increased `max_new_tokens` to {kwargs['max_new_tokens']}, "
+                        f"surpassing Whisper's `max_target_positions` (={self.config.max_target_positions}). "
+                        "This may cause out of bounds exception.")                
 
             # Reformat the forced_decoder_ids to incorporate the prompt
             non_prompt_forced_decoder_ids = (
